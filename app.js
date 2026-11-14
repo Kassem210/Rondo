@@ -23,9 +23,10 @@ const MAX_SEATS = 8;
 const MAX_NAME_LENGTH = 14;
 
 const state = {
-  screen: 'welcome',         // welcome, home, setup, online, lobby, game, leaderboard or highscores
+  screen: 'welcome',         // welcome, home, profile, setup, online, lobby, game, leaderboard or highscores
   mode: null,                // local, solo or online
-  user: null,                // { id, name, isGuest }
+  user: null,                // { id, name, isGuest, photo }
+  profileDraft: null,        // { name, photo } while the profile is being edited
   guestName: storage.read('guest-name', ''),
   game: null,
   seats: [],                 // seats being set up for a local game
@@ -54,7 +55,12 @@ function playAsGuest(name) {
   }
   storage.write('guest-name', guestName);
   state.guestName = guestName;
-  state.user = { id: 'guest-' + Math.random().toString(36).slice(2, 10), name: guestName, isGuest: true };
+  state.user = {
+    id: 'guest-' + Math.random().toString(36).slice(2, 10),
+    name: guestName,
+    isGuest: true,
+    photo: storage.read('guest-photo', ''),
+  };
   show('home');
 }
 
@@ -67,9 +73,11 @@ function onAccountChange(account) {
   }
 
   if (account) {
-    state.user = account;
+    const sameAccount = state.user && state.user.id === account.id;
+    state.user = sameAccount ? { ...account, photo: state.user.photo } : account;
     if (state.screen === 'welcome') show('home');
     else render();
+    if (!sameAccount) loadSavedPhoto(account.id);
     return;
   }
 
@@ -79,6 +87,20 @@ function onAccountChange(account) {
     state.user = null;
     state.game = null;
     show('welcome');
+  }
+}
+
+// A picture chosen on the profile screen replaces the one from Google.
+async function loadSavedPhoto(accountId) {
+  try {
+    const profile = await Stats.loadProfile(state.database, accountId);
+    const stillSignedIn = state.user && state.user.id === accountId;
+    if (profile && typeof profile.photo === 'string' && stillSignedIn) {
+      state.user.photo = profile.photo;
+      render();
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -107,6 +129,56 @@ function submitEmailForm(form, intent) {
   } else {
     signIn(() => Auth.createAccount(name, email, password));
   }
+}
+
+function editProfile() {
+  state.profileDraft = { name: state.user.name, photo: state.user.photo };
+  show('profile');
+}
+
+async function choosePhoto(file) {
+  if (!file) return;
+  try {
+    state.profileDraft.photo = await Avatar.fromFile(file);
+    state.error = '';
+  } catch (error) {
+    state.error = error.message;
+  }
+  render();
+}
+
+async function saveProfile() {
+  const name = state.profileDraft.name.trim().slice(0, MAX_NAME_LENGTH);
+  const photo = state.profileDraft.photo;
+  if (!name) {
+    state.error = 'Enter a name.';
+    render();
+    return;
+  }
+
+  if (state.user.isGuest) {
+    storage.write('guest-name', name);
+    storage.write('guest-photo', photo);
+    state.guestName = name;
+  } else {
+    state.busy = true;
+    render();
+    try {
+      await Auth.updateName(name);
+      await Stats.saveProfile(state.database, state.user.id, { name, photo });
+    } catch (error) {
+      console.error(error);
+      state.busy = false;
+      state.error = 'Could not save your profile. Check your connection.';
+      render();
+      return;
+    }
+    state.busy = false;
+  }
+
+  state.user.name = name;
+  state.user.photo = photo;
+  show('home');
 }
 
 async function leaveAccount() {
@@ -362,6 +434,7 @@ async function enterRoom(typedCode) {
 
     await room.collection('players').doc(state.user.id).set({
       name: state.user.name,
+      photo: state.user.photo,
       hasAccount: !state.user.isGuest,
       joinedAt: Date.now(),
     });
@@ -452,7 +525,9 @@ function drawAccountBar() {
   if (state.room) parts.push(`<span class="muted">Room ${state.room.code}</span>`);
   if (state.user) {
     const label = state.user.isGuest ? 'Sign in' : 'Sign out';
-    parts.push(`<span>${Views.escapeHtml(state.user.name)}</span>`);
+    const picture = Avatar.html(state.user.photo, state.user.name);
+    const name = Views.escapeHtml(state.user.name);
+    parts.push(`<button id="profile-button" data-action="edit-profile" title="Edit profile">${picture}${name}</button>`);
     parts.push(`<button data-action="leave-account">${label}</button>`);
   }
   accountBar.innerHTML = parts.join('');
@@ -513,6 +588,11 @@ function goHome() {
 const actions = {
   'go-home': goHome,
   'leave-account': leaveAccount,
+  'edit-profile': editProfile,
+  'remove-photo'() {
+    state.profileDraft.photo = '';
+    render();
+  },
   'sign-in-google': () => signIn(Auth.signInWithGoogle),
   'sign-in-apple': () => signIn(Auth.signInWithApple),
   'choose-local'() {
@@ -566,15 +646,18 @@ document.addEventListener('click', (event) => {
 document.addEventListener('input', (event) => {
   const seat = event.target.dataset.seat;
   if (seat !== undefined) state.seats[Number(seat)].name = event.target.value;
+  if (event.target.id === 'profile-name') state.profileDraft.name = event.target.value;
 });
 
 document.addEventListener('change', (event) => {
   const setting = event.target.dataset.setting;
   if (setting) changeSetting(setting, Number(event.target.value));
+  if (event.target.id === 'photo-file') choosePhoto(event.target.files[0]);
 });
 
 const forms = {
   'guest-form': (form) => playAsGuest(form.querySelector('#guest-name').value),
+  'profile-form': () => saveProfile(),
   'email-form': (form, submitter) => submitEmailForm(form, submitter ? submitter.value : 'sign-in'),
   'answer-form': (form) => submitAnswer(form.querySelector('#answer').value),
   'join-form': (form) => enterRoom(form.querySelector('#room-code').value),

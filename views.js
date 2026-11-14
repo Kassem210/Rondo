@@ -135,6 +135,45 @@ const Views = (() => {
       <button class="primary" data-action="start-local">Start game</button>`;
   }
 
+  function profile(state) {
+    const draft = state.profileDraft;
+    const removeButton = draft.photo
+      ? '<button type="button" data-action="remove-photo">Remove picture</button>'
+      : '';
+
+    return `
+      <h1>Your profile</h1>
+      <form id="profile-form" class="stack">
+        <div class="row">
+          ${Avatar.html(draft.photo, draft.name, 'large')}
+          <label class="field">
+            <span>Picture</span>
+            <input type="file" id="photo-file" accept="image/*">
+          </label>
+        </div>
+        ${removeButton}
+        <label class="field">
+          <span>Name</span>
+          <input type="text" id="profile-name" maxlength="14" autocomplete="nickname"
+            value="${escapeHtml(draft.name)}">
+        </label>
+        ${errorLine(state)}
+        <div class="row">
+          <button class="primary" ${state.busy ? 'disabled' : ''}>Save</button>
+          <button type="button" data-action="go-home">Cancel</button>
+        </div>
+      </form>`;
+  }
+
+  // A seat's picture: our own, or the one that player brought to the room.
+  function photoOf(state, seat) {
+    if (seat.isBot || !seat.id) return '';
+    if (seat.id === state.user.id) return state.user.photo;
+    const players = state.room ? state.room.players : [];
+    const player = players.find((candidate) => candidate.id === seat.id);
+    return player ? player.photo : '';
+  }
+
   function online(state) {
     if (!Auth.isConfigured) {
       return `
@@ -162,7 +201,7 @@ const Views = (() => {
     const { room } = state;
     const players = room.players.map((player) => {
       const you = player.id === state.user.id ? ' (you)' : '';
-      return `<li>${escapeHtml(player.name)}${you}</li>`;
+      return `<li>${Avatar.html(player.photo, player.name)}${escapeHtml(player.name)}${you}</li>`;
     });
     const isHost = room.hostId === state.user.id;
     const enough = room.players.length >= 2;
@@ -182,7 +221,7 @@ const Views = (() => {
       <h1>Room ${escapeHtml(room.code)}</h1>
       <p class="muted">Friends open this page, choose Play online and enter the code.</p>
       <h2>Players</h2>
-      <ul>${players.join('') || '<li class="muted">Joining…</li>'}</ul>
+      <ul class="plain">${players.join('') || '<li class="muted">Joining…</li>'}</ul>
       ${isHost ? hostControls : guestNote}
       ${errorLine(state)}
       <button data-action="go-home">Leave room</button>`;
@@ -209,14 +248,14 @@ const Views = (() => {
     return `${name} ${what} and lost a life.${example}`;
   }
 
-  function seatList(game) {
+  function seatList(state, game) {
     const rows = game.seats.map((seat, index) => {
       const current = game.status === 'playing' && index === game.turn;
       const classes = [current ? 'current' : '', seat.lives > 0 ? '' : 'out'].join(' ').trim();
       const lives = seat.lives > 0 ? livesText(seat.lives) : 'Out';
       return `
         <tr class="${classes}">
-          <td>${escapeHtml(seat.name)}</td>
+          <td>${Avatar.html(photoOf(state, seat), seat.name)}${escapeHtml(seat.name)}</td>
           <td>${lives}</td>
           <td>${plural(seat.passes, 'answer')}</td>
         </tr>`;
@@ -263,7 +302,7 @@ const Views = (() => {
       <p>${game.chain.map(escapeHtml).join(' → ') || '<span class="muted">Not started</span>'}</p>
 
       <h2>Players</h2>
-      ${seatList(game)}`;
+      ${seatList(state, game)}`;
   }
 
   function finished(state, game) {
@@ -281,7 +320,7 @@ const Views = (() => {
 
     return `
       <h1>${escapeHtml(title)}</h1>
-      ${seatList(game)}
+      ${seatList(state, game)}
       ${buttons}
       ${errorLine(state)}`;
   }
@@ -302,7 +341,7 @@ const Views = (() => {
 
     const rows = players.map((player, index) => `
       <tr>
-        <td>${index + 1}. ${escapeHtml(player.name)}</td>
+        <td>${index + 1}. ${Avatar.html(player.photo, player.name)}${escapeHtml(player.name)}</td>
         ${columns(player).map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}
       </tr>`);
     return `${heading}<table><tbody>${rows.join('')}</tbody></table>`;
@@ -337,5 +376,5 @@ const Views = (() => {
     return state.game.status === 'playing' ? playing(state, state.game) : finished(state, state.game);
   }
 
-  return { welcome, home, setup, online, lobby, game, leaderboard, highscores, escapeHtml };
+  return { welcome, home, profile, setup, online, lobby, game, leaderboard, highscores, escapeHtml };
 })();

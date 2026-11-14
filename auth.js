@@ -30,6 +30,7 @@ const Auth = (() => {
       id: user.uid,
       name: (user.displayName || emailName).slice(0, 14),
       isGuest: user.isAnonymous,
+      photo: user.photoURL || '',
     };
   }
 
@@ -59,6 +60,10 @@ const Auth = (() => {
   async function createAccount(name, email, password) {
     const created = await firebase.auth().createUserWithEmailAndPassword(email, password);
     await created.user.updateProfile({ displayName: name });
+  }
+
+  function updateName(name) {
+    return firebase.auth().currentUser.updateProfile({ displayName: name });
   }
 
   // Guests get a temporary Firebase identity so they can join online rooms.
@@ -92,6 +97,7 @@ const Auth = (() => {
     signInWithApple,
     signInWithEmail,
     createAccount,
+    updateName,
     signInAsGuest,
     signOut,
     database,

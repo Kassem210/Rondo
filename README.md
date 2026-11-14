@@ -15,6 +15,8 @@ You can play as a guest, or sign in with Google, Apple or an email and
 password. Signed-in players appear on the leaderboard (games won) and the
 high scores page (most answers in one game).
 
+Tap your name at the top to change it or add a profile picture.
+
 ## Running it
 
 It is a static site with no build step. Open `index.html` in a browser, or
@@ -61,8 +63,9 @@ a branch**, pick `main` and the root folder, and save. The site appears at
 | `records.js` | looking up names and forgiving typos |
 | `game.js` | the rules |
 | `referee.js` | deciding if an answer is right |
-| `stats.js` | saving and loading leaderboard results |
+| `stats.js` | saving and loading leaderboard results and profiles |
 | `auth.js` | signing in and out |
+| `avatar.js` | shrinking and showing profile pictures |
 | `views.js` | one function per screen |
 | `app.js` | clock, bots, online rooms, button handlers |
 | `firebase-config.js` | your Firebase project details |

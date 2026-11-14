@@ -1,16 +1,16 @@
 // All-time results, one database entry per account:
-//   { name, wins, games, best, bestAt }
+//   { name, photo, wins, games, best, bestAt }
 // "best" is the most answers that player has given in one game.
-// Guests are not recorded.
+// Guests are not recorded. The same entry holds the player's profile.
 
 const Stats = (() => {
   function addResult(entry, result) {
     const updated = {
       name: result.name,
-      wins: (entry ? entry.wins : 0) + (result.won ? 1 : 0),
-      games: (entry ? entry.games : 0) + 1,
-      best: entry ? entry.best : 0,
-      bestAt: entry ? entry.bestAt : 0,
+      wins: ((entry && entry.wins) || 0) + (result.won ? 1 : 0),
+      games: ((entry && entry.games) || 0) + 1,
+      best: (entry && entry.best) || 0,
+      bestAt: (entry && entry.bestAt) || 0,
     };
     if (result.answers > updated.best) {
       updated.best = result.answers;
@@ -42,8 +42,18 @@ const Stats = (() => {
       const entry = database.collection('players').doc(result.id);
       const saved = await entry.get();
       const { id, ...fields } = result;
-      await entry.set(addResult(saved.exists ? saved.data() : null, fields));
+      await entry.set(addResult(saved.exists ? saved.data() : null, fields), { merge: true });
     }
+  }
+
+  // The saved profile for an account, or null if it has none yet.
+  async function loadProfile(database, id) {
+    const saved = await database.collection('players').doc(id).get();
+    return saved.exists ? saved.data() : null;
+  }
+
+  function saveProfile(database, id, profile) {
+    return database.collection('players').doc(id).set(profile, { merge: true });
   }
 
   async function load(database) {
@@ -52,5 +62,5 @@ const Stats = (() => {
     return saved.docs.map((doc) => doc.data());
   }
 
-  return { record, load };
+  return { record, load, loadProfile, saveProfile };
 })();
