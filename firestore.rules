@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // A room holds one game. Anyone signed in (guests included) can play.
+    match /rooms/{room} {
+      allow read, write: if request.auth != null;
+
+      // People add only themselves to a room.
+      match /players/{player} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == player;
+      }
+    }
+
+    // All-time results. Anyone can read them. The device that ends a game
+    // writes the result for every account in it, so any signed-in player
+    // may write.
+    match /players/{player} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
