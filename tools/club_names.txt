@@ -1,0 +1,244 @@
+Arsenal|gunners
+Aston Villa|villa
+Bournemouth
+Brentford
+Brighton|brighton and hove albion,brighton hove albion
+Burnley
+Chelsea
+Crystal Palace|palace
+Everton
+Fulham
+Leeds United|leeds
+Leicester City|leicester
+Liverpool|lfc
+Manchester City|man city,city,mcfc
+Manchester United|man united,man utd,united,man u,manu,mufc
+Newcastle United|newcastle,nufc
+Nottingham Forest|forest,nottm forest
+Southampton|saints
+Tottenham|spurs,tottenham hotspur
+West Ham|west ham united
+Wolves|wolverhampton,wolverhampton wanderers
+Blackburn Rovers|blackburn
+Bolton|bolton wanderers
+Sunderland
+Middlesbrough|boro
+Portsmouth|pompey
+Stoke City|stoke
+Swansea City|swansea
+West Brom|west bromwich albion,wba
+Watford
+Derby County|derby
+QPR|queens park rangers
+Charlton|charlton athletic
+Wigan|wigan athletic
+Birmingham City|birmingham
+Sheffield United|sheffield utd
+Hull City|hull
+Norwich City|norwich
+Reading
+Coventry City|coventry
+Ipswich Town|ipswich
+MK Dons
+Preston|preston north end
+Barnsley
+Fleetwood Town|fleetwood
+Stocksbridge Park Steels|stocksbridge
+Halifax Town|halifax
+Real Madrid|madrid,real
+Barcelona|barca,fcb
+Atlético Madrid|atletico,atleti,atletico de madrid
+Sevilla
+Valencia
+Villarreal
+Real Sociedad|sociedad,la real
+Athletic Bilbao|athletic club,athletic,bilbao
+Real Betis|betis
+Deportivo La Coruña|deportivo,depor,deportivo de la coruna
+Málaga
+Espanyol
+Celta Vigo|celta,celta de vigo
+Getafe
+Mallorca|real mallorca
+Real Zaragoza|zaragoza
+Levante
+Girona
+Osasuna
+Rayo Vallecano|rayo
+Las Palmas
+Sporting Gijón|sporting de gijon,gijon
+Almería
+Granada
+Eibar
+Juventus|juve
+AC Milan|milan
+Inter Milan|inter,internazionale
+Roma|as roma
+Napoli
+Lazio
+Fiorentina
+Atalanta
+Parma
+Sampdoria
+Genoa
+Torino
+Udinese
+Bologna
+Palermo
+Cagliari
+Brescia
+Sassuolo
+Empoli
+Como
+Monza
+Lecce
+Pescara
+Verona|hellas verona
+Cremonese
+Bayern Munich|bayern,bayern munchen,fc bayern
+Borussia Dortmund|dortmund,bvb
+Bayer Leverkusen|leverkusen
+RB Leipzig|leipzig
+Schalke 04|schalke
+Werder Bremen|bremen,werder
+Hamburg|hsv,hamburger sv
+Wolfsburg
+Eintracht Frankfurt|frankfurt,eintracht
+Stuttgart|vfb stuttgart
+Borussia Mönchengladbach|gladbach,monchengladbach
+Hoffenheim
+Mainz|mainz 05
+Kaiserslautern
+Köln|cologne,koln
+Hertha Berlin|hertha,hertha bsc
+Freiburg
+Hannover 96|hannover
+Nürnberg|nurnberg,nuremberg
+St. Pauli|st pauli
+PSG|paris saint germain,paris sg,paris,paris st germain
+Marseille|om,olympique de marseille
+Lyon|ol,olympique lyonnais
+Monaco|as monaco
+Lille|losc
+Bordeaux
+Nice|ogc nice
+Rennes|stade rennais
+Saint-Étienne|st etienne,asse
+Nantes
+Lens|rc lens
+Toulouse
+Montpellier
+Metz
+Auxerre
+Le Havre
+Cannes
+Guingamp
+Lorient
+Caen
+Sochaux
+Reims|stade de reims
+Ajax
+PSV|psv eindhoven
+Feyenoord
+AZ Alkmaar|az
+Groningen
+Heerenveen
+Twente
+Vitesse
+Utrecht
+Willem II
+Sparta Rotterdam
+Benfica
+Porto|fc porto
+Sporting CP|sporting,sporting lisbon
+Braga
+Celtic
+Rangers
+Galatasaray|gala
+Fenerbahçe|fener
+Beşiktaş
+Trabzonspor
+Anderlecht
+Club Brugge|brugge
+Genk
+Gent
+Basel
+Red Bull Salzburg|salzburg,rb salzburg
+Shakhtar Donetsk|shakhtar
+Dynamo Kyiv|dynamo kiev,dinamo kiev
+Zenit|zenit st petersburg
+CSKA Moscow|cska
+Anzhi|anzhi makhachkala
+Olympiacos
+Dinamo Zagreb
+Red Star Belgrade|red star,crvena zvezda
+Partizan
+Copenhagen|fc copenhagen
+Molde
+Malmö|malmo ff
+Santos
+Flamengo
+São Paulo
+Corinthians
+Palmeiras
+Grêmio
+Internacional
+Cruzeiro
+Atlético Mineiro
+Fluminense
+Vasco da Gama|vasco
+Botafogo
+Boca Juniors|boca
+River Plate|river
+Independiente
+Racing Club|racing
+Newell's Old Boys|newells
+Estudiantes
+Vélez Sarsfield|velez
+Rosario Central
+Argentinos Juniors|argentinos
+Lanús
+Peñarol
+Nacional
+Danubio
+Liverpool Montevideo
+Inter Miami|miami
+LA Galaxy|galaxy,los angeles galaxy
+LAFC|los angeles fc
+New York Red Bulls|red bulls,ny red bulls
+New York City FC|nycfc,new york city
+New York Cosmos|cosmos
+Orlando City|orlando
+Chicago Fire
+DC United
+Toronto FC|toronto
+Montreal|cf montreal,montreal impact
+Vancouver Whitecaps|vancouver,whitecaps
+Club América|america
+Al Nassr|nassr,al nasr
+Al Hilal|hilal
+Al Ittihad|ittihad
+Al Ahli|al ahli jeddah
+Al Ettifaq|ettifaq
+Al Qadsiah|qadsiah
+Al Shabab
+Al Sadd|sadd
+Al Duhail|duhail
+Al Gharafa|gharafa
+Al Jazira|jazira
+Al Ahly|ahly
+Zamalek
+Al Mokawloon|arab contractors,el mokawloon,mokawloon
+Wadi Degla|degla
+Tersana
+Baniyas
+Vissel Kobe|kobe
+Shanghai SIPG|shanghai port
+Shanghai Shenhua|shenhua
+Guangzhou Evergrande|guangzhou
+Hebei China Fortune|hebei
+Dalian Yifang|dalian
+Sydney FC|sydney
+CSKA Sofia
+Cardiff City|cardiff
+Mumbai City

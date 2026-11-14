@@ -1,0 +1,86 @@
+Lionel Messi|leo messi
+Cristiano Ronaldo|cr7,cristiano
+Neymar|neymar jr
+Mohamed Salah|mo salah
+Kevin De Bruyne|kdb
+Robert Lewandowski|lewy
+Vinícius Júnior|vinicius jr,vini jr,vini,vinicius
+Lamine Yamal|yamal
+Martin Ødegaard|odegaard
+Trent Alexander-Arnold|trent,taa
+Virgil van Dijk|vvd
+Alisson|alisson becker
+Roberto Firmino|bobby firmino
+Luis Díaz|lucho diaz
+Andrew Robertson|andy robertson
+Thiago Alcântara|thiago
+Steven Gerrard|stevie g
+Fernando Torres|el nino
+Wayne Rooney|wazza
+David Beckham|becks
+Robin van Persie|rvp
+Zlatan Ibrahimović|ibra,zlatan
+Rasmus Højlund|hojlund
+Benjamin Šeško|sesko
+Thierry Henry|titi
+Robert Pirès|pires
+Pierre-Emerick Aubameyang|auba
+Viktor Gyökeres|gyokeres
+Frank Lampard|lamps
+Petr Čech|cech
+N'Golo Kanté|kante
+César Azpilicueta|azpi,dave
+Sergio Agüero|kun aguero,kun
+Gianluigi Donnarumma|gigio
+Son Heung-min|sonny,son
+Dele Alli|dele
+Paul Gascoigne|gazza
+Jay-Jay Okocha|okocha
+Emiliano Martínez|dibu martinez,emi martinez,dibu
+Xavi|xavi hernandez
+Sergio Busquets|busi
+Ronaldinho|dinho,ronaldinho gaucho
+Ronaldo Nazário|r9,ronaldo,el fenomeno
+Johan Cruyff|cruijff
+Diego Maradona|el diego
+Pedro|pedro rodriguez
+David Villa|el guaje
+Antoine Griezmann|grizi
+Zinedine Zidane|zizou
+Raúl|raul gonzalez
+Kaká|kaka
+Gonzalo Higuaín|pipita
+Federico Valverde|fede valverde
+Radamel Falcao|el tigre
+Diego Simeone|cholo
+Gennaro Gattuso|rino gattuso
+Andriy Shevchenko|sheva
+Filippo Inzaghi|pippo inzaghi
+Alessandro Del Piero|pinturicchio
+Gianluigi Buffon|gigi buffon
+Roberto Baggio|il divin codino
+Paulo Dybala|la joya
+Javier Zanetti|pupi
+Adriano|adriano imperador
+Christian Vieri|bobo vieri
+Francesco Totti|er pupone
+Gabriel Batistuta|batigol
+Khvicha Kvaratskhelia|kvara
+Sergej Milinković-Savić|sms
+Bastian Schweinsteiger|schweini
+Franz Beckenbauer|der kaiser
+Jakub Błaszczykowski|kuba
+Ezequiel Lavezzi|pocho
+Juninho Pernambucano|juninho
+Jean-Pierre Papin|jpp
+Georginio Wijnaldum|gini wijnaldum
+Alex de Souza|alex
+Pelé|pele
+Gabriel Barbosa|gabigol
+Estêvão|estevao willian
+Ganso|paulo henrique ganso
+Javier Hernández|chicharito
+Hirving Lozano|chucky lozano
+Mido|ahmed hossam
+Mohamed Aboutrika|abou trika,aboutreika
+Yassine Bounou|bono

@@ -2,6 +2,7 @@
 // person typed against them.
 
 const Records = (() => {
+  // Keys are Wikidata ids such as "Q615".
   const players = new Map();      // key -> { type, key, name, clubs: Set of club keys }
   const clubs = new Map();        // key -> { type, key, name, players: [] }
   const playerNames = new Map();  // typed form -> matching players
@@ -29,12 +30,9 @@ const Records = (() => {
     return (kept.length ? kept : words).join(' ');
   }
 
-  function playerKey(name) {
-    return 'p:' + normalize(name);
-  }
-
-  function clubKey(name) {
-    return 'c:' + normalizeClub(name);
+  // A key for an answer that is not in the records or on Wikidata.
+  function unlistedKey(type, text) {
+    return type === 'player' ? 'p:' + normalize(text) : 'c:' + normalizeClub(text);
   }
 
   function addName(index, name, entry) {
@@ -50,8 +48,8 @@ const Records = (() => {
 
   function loadClubs(raw) {
     for (const line of raw.trim().split('\n')) {
-      const [name, aliases] = line.split('|');
-      const club = { type: 'club', key: clubKey(name), name, players: [] };
+      const [key, name, aliases] = line.split('|');
+      const club = { type: 'club', key, name, players: [] };
       clubs.set(club.key, club);
       addName(clubNames, normalizeClub(name), club);
       for (const alias of splitList(aliases, ',')) {
@@ -62,11 +60,11 @@ const Records = (() => {
 
   function loadPlayers(raw) {
     for (const line of raw.trim().split('\n')) {
-      const [name, aliases, clubList] = line.split('|');
-      const player = { type: 'player', key: playerKey(name), name, clubs: new Set() };
+      const [key, name, aliases, clubKeys] = line.split('|');
+      const player = { type: 'player', key, name, clubs: new Set() };
 
-      for (const clubName of splitList(clubList, ';')) {
-        const club = clubs.get(clubKey(clubName));
+      for (const clubKey of splitList(clubKeys, ' ')) {
+        const club = clubs.get(clubKey);
         if (!club) continue;
         player.clubs.add(club.key);
         club.players.push(player);
@@ -130,13 +128,6 @@ const Records = (() => {
     return matches;
   }
 
-  // Remember a fact confirmed during play, so bots can use it too.
-  function link(player, club) {
-    if (player.clubs.has(club.key)) return;
-    player.clubs.add(club.key);
-    club.players.push(player);
-  }
-
   loadClubs(RAW_RECORDS.clubs);
   loadPlayers(RAW_RECORDS.players);
 
@@ -146,9 +137,7 @@ const Records = (() => {
     allPlayers,
     normalize,
     normalizeClub,
-    playerKey,
-    clubKey,
-    link,
+    unlistedKey,
     findPlayers: (text) => search(playerNames, normalize(text)),
     findClubs: (text) => search(clubNames, normalizeClub(text)),
   };

@@ -59,9 +59,10 @@ a branch**, pick `main` and the root folder, and save. The site appears at
 | File | What it holds |
 |---|---|
 | `index.html`, `style.css` | the page and its styling |
-| `data.js` | the player and club lists |
+| `data.js` | the player and club lists, generated from Wikidata |
 | `records.js` | looking up names and forgiving typos |
 | `game.js` | the rules |
+| `wikidata.js` | looking up answers that are not in `data.js` |
 | `referee.js` | deciding if an answer is right |
 | `stats.js` | saving and loading leaderboard results and profiles |
 | `auth.js` | signing in and out |
@@ -70,17 +71,36 @@ a branch**, pick `main` and the root folder, and save. The site appears at
 | `app.js` | clock, bots, online rooms, button handlers |
 | `firebase-config.js` | your Firebase project details |
 | `firestore.rules` | who may read and write the database |
+| `tools/` | the script that rebuilds `data.js` |
 
-## Adding players and clubs
+## Where the player data comes from
 
-`data.js` holds one record per line. A club is `Name|alias,alias`. A player
-is `Name|alias,alias|Club; Club; Club`, and every club named there must
-also be in the club list. Answers the records do not know can still be
-counted during a game with **Count it anyway**.
+`data.js` is generated from [Wikidata](https://www.wikidata.org), the
+database behind Wikipedia. It holds every footballer with articles in 20 or
+more Wikipedia languages, and every club Wikidata lists for them.
+
+An answer that is not in `data.js` is looked up on Wikidata while you play,
+which takes a second or so. If that lookup fails or disagrees, the answer
+can still be counted with **Count it anyway**.
+
+To refresh the data after a transfer window:
+
+```bash
+rm -rf tools/cache
+```
+
+```bash
+python3 tools/build_data.py
+```
+
+The download takes about 15 minutes because the service allows roughly one
+query a minute. `tools/club_names.txt` and `tools/player_nicknames.txt`
+hold hand-written short names and nicknames ("Barca", "CR7") that are added
+on top of Wikidata's own.
 
 ## Known limits
 
-- The records were written from memory and cover a few hundred well-known
-  players, so some career lists are incomplete.
+- Wikidata is edited by volunteers, so the odd career list is incomplete or
+  slow to pick up a new transfer.
 - Any signed-in player can write leaderboard results, so the tables are
   only as trustworthy as the people playing.

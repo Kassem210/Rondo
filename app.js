@@ -234,23 +234,37 @@ function isMyTurn(game) {
 
 const REJECTIONS = {
   used: 'That has already been said. Try another.',
-  unknown: 'That is not in the records.',
+  wrong: 'That does not look right.',
+  unknown: 'That could not be checked.',
 };
 
-function submitAnswer(text) {
+async function submitAnswer(text) {
   const game = state.game;
-  if (!isMyTurn(game) || !text.trim()) return;
+  if (state.busy || !isMyTurn(game) || !text.trim()) return;
 
-  const result = Referee.check(game, text);
-  if (result.ok) {
-    save(Game.acceptAnswer(game, result.answer));
+  // Most answers are checked instantly. A Wikidata lookup takes a moment,
+  // and the clock does not run out while it is in progress.
+  state.busy = true;
+  state.feedback = { text: 'Checking…' };
+  render();
+  const result = await Referee.check(game, text);
+  state.busy = false;
+
+  const turnMoved = !state.game || turnKey(state.game) !== turnKey(game);
+  if (turnMoved || state.game.status !== 'playing') {
+    render();
     return;
   }
 
-  // The records do not hold every player, so an unknown answer can be
+  if (result.ok) {
+    save(Game.acceptAnswer(state.game, result.answer));
+    return;
+  }
+
+  // No source is complete, so anything not already said can still be
   // counted on the players' word.
   state.feedback = { text: REJECTIONS[result.reason], isError: true };
-  if (result.reason === 'unknown') state.feedback.trustText = text;
+  if (result.reason !== 'used') state.feedback.trustText = text;
   render();
   document.querySelector('#answer').select();
 }
@@ -310,7 +324,7 @@ function tick() {
   drawClock(game);
   if (clock.done) return;
 
-  let timeIsUp = timeRemaining() <= 0;
+  let timeIsUp = timeRemaining() <= 0 && !state.busy;
   if (!isMyTurn(game)) {
     const delay = isOnline() ? takeoverDelay(game) : null;
     timeIsUp = delay !== null && -timeRemaining() > delay;
@@ -552,7 +566,7 @@ function render() {
   const newBox = document.querySelector('#answer');
   if (turnKey(game) === renderedTurn) newBox.value = typed;
   renderedTurn = turnKey(game);
-  if (state.canAnswer) newBox.focus({ preventScroll: true });
+  if (state.canAnswer && !state.busy) newBox.focus({ preventScroll: true });
 }
 
 function show(screen) {
