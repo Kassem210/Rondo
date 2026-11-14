@@ -45,6 +45,12 @@ const Views = (() => {
     return state.error ? `<p class="error">${escapeHtml(state.error)}</p>` : '';
   }
 
+  function accountsUnavailable() {
+    return Auth.scriptsBlocked
+      ? 'Sign-in could not load. Check your connection, turn off any content blocker for this site, and reload.'
+      : 'Accounts are not set up on this site yet.';
+  }
+
   function welcome(state) {
     const accounts = Auth.isConfigured
       ? `
@@ -65,7 +71,7 @@ const Views = (() => {
           <button name="intent" value="create">Create account</button>
         </div>
       </form>`
-      : '<p class="muted">Accounts are not set up on this site yet.</p>';
+      : `<p class="muted">${accountsUnavailable()}</p>`;
 
     return `
       <h1>Rondo</h1>

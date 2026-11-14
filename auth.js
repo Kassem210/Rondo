@@ -2,7 +2,9 @@
 // until firebase-config.js is filled in.
 
 const Auth = (() => {
-  const isConfigured = Boolean(FIREBASE_CONFIG) && typeof firebase !== 'undefined';
+  // The Firebase scripts can fail to load, for example behind a content blocker.
+  const scriptsBlocked = Boolean(FIREBASE_CONFIG) && typeof firebase === 'undefined';
+  const isConfigured = Boolean(FIREBASE_CONFIG) && !scriptsBlocked;
 
   const ERROR_MESSAGES = {
     'auth/invalid-email': 'That email address is not valid.',
@@ -83,6 +85,7 @@ const Auth = (() => {
 
   return {
     isConfigured,
+    scriptsBlocked,
     start,
     currentUser,
     signInWithGoogle,

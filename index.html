@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rondo</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <div class="page">
@@ -16,18 +16,19 @@
   </div>
 
   <!-- Firebase handles accounts, online rooms and the leaderboard. -->
+  <!-- Raise the ?v= number on the scripts below when they change, so browsers fetch the new copies. -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
-  <script src="firebase-config.js"></script>
-  <script src="data.js"></script>
-  <script src="records.js"></script>
-  <script src="game.js"></script>
-  <script src="referee.js"></script>
-  <script src="stats.js"></script>
-  <script src="auth.js"></script>
-  <script src="views.js"></script>
-  <script src="app.js"></script>
+  <script src="firebase-config.js?v=2"></script>
+  <script src="data.js?v=2"></script>
+  <script src="records.js?v=2"></script>
+  <script src="game.js?v=2"></script>
+  <script src="referee.js?v=2"></script>
+  <script src="stats.js?v=2"></script>
+  <script src="auth.js?v=2"></script>
+  <script src="views.js?v=2"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
