@@ -209,17 +209,48 @@ function showNetworkError(error) {
 
 // Replace the game with a new version.
 function save(game) {
-  const previous = state.game ? state.game.version : state.room ? state.room.version : 0;
   const justFinished = game.status === 'over' && (!state.game || state.game.status === 'playing');
-  game.version = previous + 1;
-  state.game = game;
-  state.feedback = null;
 
   if (isOnline()) {
-    roomDocument().set({ ...game, hostId: state.room.hostId }).catch(showNetworkError);
+    saveOnline(game, justFinished);
+    return;
   }
-  // Whichever device ends the game records it, so it is counted once.
+
+  game.version = (state.game ? state.game.version : 0) + 1;
+  state.game = game;
+  state.feedback = null;
   if (justFinished) Stats.record(game, state.database).catch(console.error);
+  render();
+}
+
+// Online, the room document is the only copy of the game that counts.
+// A move is written only if nobody else has changed the game since this
+// device last saw it, and every device then redraws from the document.
+// That keeps all screens identical even when two devices act at once,
+// for example an answer arriving just as another device calls time.
+async function saveOnline(game, justFinished) {
+  const seenVersion = state.game ? state.game.version : state.room.version;
+  const room = roomDocument();
+  const { hostId } = state.room;
+
+  state.busy = true;
+  render();
+  try {
+    const written = await state.database.runTransaction(async (transaction) => {
+      const current = (await transaction.get(room)).data();
+      if (!current || current.version !== seenVersion) return false;
+      transaction.set(room, { ...game, hostId, version: seenVersion + 1 });
+      return true;
+    });
+    // Whichever device ends the game records it, so it is counted once.
+    if (written && justFinished) Stats.record(game, state.database).catch(console.error);
+  } catch (error) {
+    // Let the clock try again shortly instead of stalling the turn.
+    clock.done = false;
+    clock.endsAt = Date.now() + RETRY_DELAY;
+    showNetworkError(error);
+  }
+  state.busy = false;
   render();
 }
 
@@ -281,6 +312,7 @@ function trustAnswer() {
 // changes. The device whose turn it is decides when time is up.
 
 const LOW_TIME = 5000;
+const RETRY_DELAY = 3000;   // wait after a failed save before trying again
 const clock = { turn: '', endsAt: 0, done: false };
 
 function turnKey(game) {
@@ -312,8 +344,8 @@ function drawClock(game) {
 // In an online game, how long this device waits past the end of someone
 // else's turn before ending it for them. Covers a player who has left.
 function takeoverDelay(game) {
-  if (game.seats[Game.nextSeatAlive(game)].id === state.user.id) return 6000;
-  if (state.room.hostId === state.user.id) return 12000;
+  if (game.seats[Game.nextSeatAlive(game)].id === state.user.id) return 10000;
+  if (state.room.hostId === state.user.id) return 16000;
   return null;
 }
 
@@ -409,8 +441,6 @@ function onRoomChange(snapshot) {
     return;
   }
 
-  // Ignore an older version that arrives after our own newer write.
-  if (state.game && data.version < state.game.version) return;
   if (!state.game || data.turnNumber !== state.game.turnNumber) state.feedback = null;
   state.game = data;
   state.screen = 'game';
