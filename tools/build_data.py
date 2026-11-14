@@ -12,6 +12,7 @@ import json
 import re
 import sys
 import unicodedata
+from collections import Counter
 from pathlib import Path
 
 import wikidata
@@ -22,7 +23,7 @@ OUTPUT = TOOLS.parent / 'data.js'
 
 # Wikipedia language count is a rough measure of fame. Each range is one
 # query, kept small enough to finish inside the service's time limit.
-LINK_RANGES = [(40, 100000), (30, 40), (24, 30), (20, 24)]
+LINK_RANGES = [(40, 100000), (30, 40), (24, 30)]
 MIN_LINKS = LINK_RANGES[-1][0]
 
 TEAM_BATCH = 2500
@@ -31,6 +32,13 @@ MAX_ALIAS_LENGTH = 30
 
 NATIONAL_TEAM = re.compile(r'national|olympic|under-\d|\bU-?\d\d\b', re.IGNORECASE)
 CLUB_AFFIXES = re.compile(r'^(FC|AFC) | (F\.C\.|FC|A\.F\.C\.|AFC|C\.F\.|CF)$')
+
+# Words dropped to get the name people actually say: "A.S. Roma" -> "Roma".
+CLUB_FILLER_WORDS = {
+    'fc', 'cf', 'afc', 'ac', 'as', 'ss', 'sc', 'sv', 'us', 'uc', 'cd', 'ud', 'rc', 'rcd', 'sd',
+    'ca', 'cr', 'se', 'ec', 'fk', 'sk', 'bk', 'if', 'ff', 'sl', 'vfb', 'vfl', 'tsg', 'ogc',
+    '1', 'calcio', 'club', 'de', 'futbol', 'football', 'stade',
+}
 
 
 def cached(name, fetch):
@@ -99,6 +107,11 @@ def clean_aliases(text, own_name):
     return kept[:MAX_ALIASES]
 
 
+def short_club_name(name):
+    words = [word for word in name.split() if normalize(word) not in CLUB_FILLER_WORDS]
+    return ' '.join(words)
+
+
 def read_overrides(filename):
     """Hand-written "Name|alias,alias" lines, keyed by normalized name."""
     overrides = {}
@@ -108,8 +121,8 @@ def read_overrides(filename):
     return overrides
 
 
-def apply_overrides(entries, overrides):
-    """Give the best-known entry matching each override its name and aliases."""
+def apply_overrides(entries, overrides, rank):
+    """Give the top-ranked entry matching each override its name and aliases."""
     by_name = {}
     for entry in entries:
         for name in [entry['name'], *entry['aliases']]:
@@ -117,11 +130,13 @@ def apply_overrides(entries, overrides):
 
     unmatched = []
     for key, (name, aliases) in overrides.items():
-        matches = by_name.get(key)
+        # Try the override's own name first, then its longer aliases.
+        candidates = [key] + [normalize(alias) for alias in aliases if len(alias) >= 6]
+        matches = next((by_name[c] for c in candidates if c in by_name), None)
         if not matches:
             unmatched.append(name)
             continue
-        best = max(matches, key=lambda entry: entry['links'])
+        best = max(matches, key=lambda entry: entry[rank])
         extra = [alias for alias in [best['name'], *aliases] if normalize(alias) != normalize(name)]
         best['aliases'] = clean_aliases('|'.join(extra + best['aliases']), name)
         best['name'] = name
@@ -147,7 +162,8 @@ def load_players():
 
 
 def load_clubs(players):
-    ids = sorted({team for player in players for team in player['teams']})
+    team_sizes = Counter(team for player in players for team in player['teams'])
+    ids = sorted(team_sizes)
     clubs = []
     for start in range(0, len(ids), TEAM_BATCH):
         batch = ids[start:start + TEAM_BATCH]
@@ -155,23 +171,25 @@ def load_clubs(players):
             if NATIONAL_TEAM.search(row['name']):
                 continue
             name = CLUB_AFFIXES.sub('', row['name']).replace('|', ' ').strip()
-            aliases = '|'.join([row['name'], row.get('aliases', '')])
+            aliases = '|'.join([short_club_name(name), row['name'], row.get('aliases', '')])
             clubs.append({
                 'id': wikidata.entity_id(row['item']),
                 'name': name,
-                'links': int(row['links']),
                 'aliases': clean_aliases(aliases, name),
+                # Wikidata has stray entries (a city, a cycling team). Ranking
+                # clubs by how many players they have keeps those at the bottom.
+                'size': team_sizes[wikidata.entity_id(row['item'])],
             })
     return clubs
 
 
 def write_output(players, clubs):
-    club_links = {club['id']: club['links'] for club in clubs}
+    club_sizes = {club['id']: club['size'] for club in clubs}
 
     player_lines = []
     used_clubs = set()
     for player in sorted(players, key=lambda player: -player['links']):
-        teams = sorted((t for t in player['teams'] if t in club_links), key=lambda t: -club_links[t])
+        teams = sorted((t for t in player['teams'] if t in club_sizes), key=lambda t: -club_sizes[t])
         if not teams:
             continue
         used_clubs.update(teams)
@@ -180,7 +198,7 @@ def write_output(players, clubs):
 
     club_lines = [
         '|'.join([club['id'], club['name'], ','.join(club['aliases'])])
-        for club in sorted(clubs, key=lambda club: -club['links'])
+        for club in sorted(clubs, key=lambda club: -club['size'])
         if club['id'] in used_clubs
     ]
 
@@ -204,8 +222,8 @@ def main():
     players = load_players()
     clubs = load_clubs(players)
 
-    missing = apply_overrides(clubs, read_overrides('club_names.txt'))
-    missing += apply_overrides(players, read_overrides('player_nicknames.txt'))
+    missing = apply_overrides(clubs, read_overrides('club_names.txt'), rank='size')
+    missing += apply_overrides(players, read_overrides('player_nicknames.txt'), rank='links')
     if missing:
         print('no match for: ' + ', '.join(missing), file=sys.stderr)
 
